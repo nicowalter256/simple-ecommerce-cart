@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:simplecommerce/views/cart_items.dart';
+import 'package:simplecommerce/views/payment_page.dart';
 import '../controller/products_controller.dart';
 
 class CartScreen extends StatefulWidget {
@@ -36,6 +38,9 @@ class _CartScreenState extends State<CartScreen> {
         value: productController,
         child: Consumer<ProductController>(
           builder: (_, model, child) {
+            final subTotal = widget.cartItems
+                .fold(0, (sum, item) => sum + (int.parse(item['price'])));
+
             if (widget.cartItems.isEmpty) {
               return const Center(
                 child: Text(
@@ -47,7 +52,7 @@ class _CartScreenState extends State<CartScreen> {
 
             return ListView.separated(
                 itemBuilder: (ctx, index) {
-                  if (index <= widget.cartItems.length) {
+                  if (index <= widget.cartItems.length - 1) {
                     return CartItemWidget(
                       item: widget.cartItems[index],
                     );
@@ -59,7 +64,7 @@ class _CartScreenState extends State<CartScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Subtotal: ',
+                              'Subtotal: $subTotal',
                               style: Theme.of(context).textTheme.titleMedium,
                             ),
                             // Text("$subTotal"),
@@ -75,7 +80,11 @@ class _CartScreenState extends State<CartScreen> {
                                   backgroundColor: Colors.green),
                               // style:
                               //     Theme.of(context).elevatedButtonTheme.style,
-                              onPressed: () {},
+                              onPressed: () {
+                                Get.to(PaymentMethod(
+                                  amount: 1000,
+                                ));
+                              },
                               child: const Text(
                                 'Checkout',
                                 style: TextStyle(color: Colors.white),
@@ -90,7 +99,7 @@ class _CartScreenState extends State<CartScreen> {
                     height: 5,
                   );
                 },
-                itemCount: widget.cartItems.length);
+                itemCount: widget.cartItems.length + 1);
           },
         ),
       ),
